@@ -1,4 +1,5 @@
 import time
+from typing import Literal
 from fastapi import APIRouter, Depends, Query
 
 from app.repository.product import ProductRepository
@@ -18,9 +19,13 @@ router = APIRouter()
 def search_product(
     service: ProductService = Depends(get_product_service),
     search: str | None = Query(default="", max_length=100),
+    method: Literal["tsvector", "sbert"] = "tsvector"
 ):
     tic = time.perf_counter()
-    data = service.get_product_using_tsvector(search)
+    if (method == "tsvector"):
+        data = service.get_product_using_tsvector(search)
+    else:
+        data = service.get_product_using_sbert(search)
     toc = time.perf_counter()
 
     response = {
