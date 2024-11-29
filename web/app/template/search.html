@@ -34,6 +34,11 @@
       text-align: center;
     }
 
+    h1 a {
+      text-decoration: none;
+      color: inherit;
+    }
+
     h2 {
       font-size: 18px;
       color: #333;
@@ -137,6 +142,7 @@
 
     .product h3 a {
       text-decoration: none;
+      color: blue;
     }
 
     .product h3 a:hover {
@@ -189,7 +195,11 @@
 
 <body>
   <div class="container">
-    <h1>RSBP Search</h1>
+    <h1>
+      <a href="/">
+        RSBP Search    
+      </a>
+    </h1>
     <form id="search-form" class="search-container">
       <div class="search-input">
         <input name="search" type="text" placeholder="Search products..." value="{{ search }}">
