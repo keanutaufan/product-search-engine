@@ -6,7 +6,7 @@ class ProductRepository:
         self.db = db
 
     def get_product_by_id(self, id: int) -> dict | None:
-        query = "SELECT product_id, title, bullet_points, description FROM product WHERE product_id = %s"
+        query = "SELECT product_id AS id, title, bullet_points, description FROM product WHERE product_id = %s"
         with self.db.cursor(row_factory=dict_row) as cursor:
             cursor.execute(query, (id,))
             return cursor.fetchone()

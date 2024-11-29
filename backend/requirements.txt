@@ -3,3 +3,4 @@ psycopg[binary]
 psycopg_pool
 python-dotenv
 sentence_transformers
+jinja2
