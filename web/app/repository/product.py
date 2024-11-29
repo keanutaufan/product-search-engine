@@ -18,7 +18,7 @@ class ProductRepository:
             return cursor.fetchall()
 
     def get_product_using_sbert(self, vector: list):
-        query = "SELECT * FROM query_vector(50, %s::VECTOR) LIMIT 50"
+        query = "SELECT * FROM search_sbert(50, %s::VECTOR) LIMIT 50"
         with self.db.cursor(row_factory=dict_row) as cursor:
             cursor.execute(query, (vector,))
             return cursor.fetchall()
