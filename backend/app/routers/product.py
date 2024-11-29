@@ -1,6 +1,6 @@
 import time
 from typing import Literal
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException
 
 from app.repository.product import ProductRepository
 from app.service.product import ProductService
@@ -34,3 +34,15 @@ def search_product(
     }
 
     return response
+
+
+@router.get("/{id}")
+def get_product_by_id(
+    service: ProductService = Depends(get_product_service),
+    id: int = 1,
+):
+    product = service.get_product_by_id(id)
+    if product is None:
+        raise HTTPException(status_code=404, detail="Not found")
+    
+    return product
