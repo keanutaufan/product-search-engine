@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RSBPSearch | {{ search }}</title>
+</head>
+<body>
+  <form action="/product/">
+    <input type="text" name="search" value="{{ search }}" />
+    <input type="hidden" name="method" value="sbert" />
+    <button type="submit">Submit</button>
+  </form>
+  <p>Search took {{ response_time }} ms</p>
+  <h1>Search result for {{ search }}</h1>
+  {% for product in data %}
+    <p>{{ product.title }}</p>
+  {% endfor %}
+</body>
+</html>

@@ -20,22 +20,31 @@ router = APIRouter()
 @router.get("/")
 def search_product(
     service: ProductService = Depends(get_product_service),
+    template: Jinja2Templates = Depends(get_template),
+    request: Request = Request,
     search: str | None = Query(default="", max_length=100),
     method: Literal["tsvector", "sbert"] = "tsvector"
 ):
-    tic = time.perf_counter()
+    tic = time.perf_counter_ns()
     if (method == "tsvector"):
-        data = service.get_product_using_tsvector(search)
+        product = service.get_product_using_tsvector(search)
     else:
-        data = service.get_product_using_sbert(search)
-    toc = time.perf_counter()
+        product = service.get_product_using_sbert(search)
+    toc = time.perf_counter_ns()
 
-    response = {
-        "response_time": toc - tic,
-        "data": data,
+    context = {
+        "response_time": (toc - tic) / 1000000,
+        "search": search,
+        "method": method,
+        "data": product,
     }
 
-    return response
+    return template.TemplateResponse(
+        request=request,
+        name="search.html",
+        context=context,
+        status_code=200,
+    )
 
 
 @router.get("/{id}")
