@@ -1,4 +1,4 @@
-import time
+import time, re
 from typing import Literal
 from fastapi import APIRouter, Depends, Query, HTTPException, Request
 from fastapi.templating import Jinja2Templates
@@ -32,11 +32,20 @@ def search_product(
         product = service.get_product_using_sbert(search)
     toc = time.perf_counter_ns()
 
+    def processor(x):
+        return {
+            "id": x["id"],
+            "title": x["title"],
+            "description": re.sub('<[^<]+?>', '', x["description"])
+        }
+
+    processed = [processor(p) for p in product]
+
     context = {
         "response_time": (toc - tic) / 1000000,
         "search": search,
         "method": method,
-        "data": product,
+        "data": processed,
     }
 
     return template.TemplateResponse(

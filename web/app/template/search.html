@@ -1,20 +1,225 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RSBPSearch | {{ search }}</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      background-color: #00644d;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 800px;
+    }
+
+    h1 {
+      margin: 0 0 1rem;
+      color: #333;
+      font-size: 24px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 18px;
+      color: #333;
+      margin: 2rem 0 1rem;
+    }
+
+    .search-container {
+      margin-bottom: 2rem;
+    }
+
+    .search-input {
+      display: flex;
+      gap: 8px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .select-wrapper {
+      position: relative;
+      min-width: 120px;
+    }
+
+    select {
+      appearance: none;
+      background-color: #f5f5f5;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 8px 32px 8px 12px;
+      font-size: 14px;
+      color: #333;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .select-wrapper::after {
+      content: "\25BC";
+      position: absolute;
+      top: 50%;
+      right: 12px;
+      transform: translateY(-50%);
+      pointer-events: none;
+      font-size: 12px;
+      color: #666;
+    }
+
+    button {
+      padding: 8px 16px;
+      background: #00644d;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #095c48;
+    }
+
+    .results {
+      border-top: 1px solid #eee;
+      padding-top: 1rem;
+    }
+
+    .results-heading {
+      margin-bottom: 2rem;
+    }
+
+    .results-heading h2 {
+      padding: 0;
+      margin: 0;
+    }
+
+    .results-heading .performance {
+      font-size: small;
+      color: #666;
+    }
+
+    .product {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid #eee;
+    }
+
+    .product:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .product h3 {
+      margin: 0 0 0.5rem;
+      font-size: 18px;
+    }
+
+    .product h3 a {
+      text-decoration: none;
+    }
+
+    .product h3 a:hover {
+      text-decoration: underline;
+    }
+
+    .product .description {
+      margin: 0;
+      font-size: 14px;
+      color: #666;
+      font-weight: normal;
+
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
+      line-height: 1.5;
+      max-height: calc(1.5em * 3);
+    }
+
+    .product .description * {
+      display: inline;
+      font-weight: normal;
+    }
+
+    .product .description br {
+      display: none;
+    }
+
+    .product .description p::after {
+      content: " ";
+    }
+
+    @media (max-width: 600px) {
+      .search-input {
+        flex-direction: column;
+      }
+
+      .select-wrapper {
+        width: 100%;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
+
 <body>
-  <form action="/product/">
-    <input type="text" name="search" value="{{ search }}" />
-    <input type="hidden" name="method" value="sbert" />
-    <button type="submit">Submit</button>
-  </form>
-  <p>Search took {{ response_time }} ms</p>
-  <h1>Search result for {{ search }}</h1>
-  {% for product in data %}
-    <p>{{ product.title }}</p>
-  {% endfor %}
+  <div class="container">
+    <h1>RSBP Search</h1>
+    <form id="search-form" class="search-container">
+      <div class="search-input">
+        <input name="search" type="text" placeholder="Search products..." value="{{ search }}">
+        <div class="select-wrapper">
+          <select id="search-method" name="method">
+            <option value="tsvector" {% if method=="tsvector" %} selected {% endif %}>TSVector</option>
+            <option value="sbert" {% if method=="sbert" %} selected {% endif %}>SBERT</option>
+            <option value="bm25" {% if method=="bm25" %} selected {% endif %}>BM25</option>
+          </select>
+        </div>
+        <button type="submit">Search</button>
+      </div>
+    </form>
+
+    <div class="results">
+      <div class="results-heading">
+        <h2>Search Results for {{ search }}</h2>
+        <p class="performance">Search took {{ response_time }} ms.</p>
+      </div>
+      {% for product in data %}
+      <div class="product">
+        <h3>
+          <a href="/product/{{ product.id }}">
+            {{ product.title }}</h3>
+          </a>
+        <div class="description">{{ product.description }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
 </body>
+
 </html>

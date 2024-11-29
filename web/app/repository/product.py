@@ -12,7 +12,7 @@ class ProductRepository:
             return cursor.fetchone()
 
     def get_product_using_tsvector(self, search: str) -> list[dict]:
-        query = "SELECT * FROM search_products(%s) LIMIT 50"
+        query = "SELECT * FROM search_tsvector(%s) LIMIT 50"
         with self.db.cursor(row_factory=dict_row) as cursor:
             cursor.execute(query, (search,))
             return cursor.fetchall()
