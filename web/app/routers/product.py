@@ -23,15 +23,17 @@ def search_product(
     template: Jinja2Templates = Depends(get_template),
     request: Request = Request,
     search: str | None = Query(default="", max_length=100),
-    method: Literal["tsvector", "sbert", "bm25"] = "tsvector"
+    method: Literal["tsvector", "sbert", "bm25", "bm25_lib"] = "tsvector"
 ):
     tic = time.perf_counter_ns()
     if (method == "tsvector"):
         product = service.get_product_using_tsvector(search)
     elif (method == "sbert"):
         product = service.get_product_using_sbert(search)
-    else:
+    elif (method == "bm25"):
         product = service.get_product_using_realmen_bm25(search)
+    else:
+        product = service.get_product_using_lib_bm25(search)
     toc = time.perf_counter_ns()
 
     def processor(x):

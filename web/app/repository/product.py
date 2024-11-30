@@ -5,8 +5,10 @@ from psycopg.rows import dict_row
 import numpy as np
 from numpy.typing import ArrayLike
 import pandas as pd
+from rank_bm25 import BM25Okapi
 
 class ProductRepository:
+    # Related to handmade bm25
     df: pd.DataFrame
     tokenized_titles: pd.Series
     ids: ArrayLike
@@ -14,6 +16,9 @@ class ProductRepository:
     descriptions = ArrayLike
     idf: dict
     avgdl: float
+
+    # Related to lib bm25
+    bm25: BM25Okapi    
 
     def __init__(self, db: Connection, csv_path: str = ""):
         self.db = db
@@ -32,6 +37,8 @@ class ProductRepository:
 
         self.idf = {word: np.log(((N - count + 0.5) / (count + 0.5)) + 1) for word, count in word_doc_count.items()}
         self.avgdl = sum(len(sentence) for sentence in self.tokenized_titles) / N
+
+        self.bm25 = BM25Okapi(self.tokenized_titles)
 
     def __realmen_bm25(self, word: str, sentence: str, idf: dict, avgdl: float, k=1.2, b=0.75) -> float:
         freq = sentence.count(word)
@@ -73,5 +80,18 @@ class ProductRepository:
             "description": self.descriptions[i],
             "rank": scores[i],
         } for i in top_indices]
+
+        return result
+    
+    def get_product_using_lib_bm25(self, search: str) -> list[dict]:
+        scores = self.bm25.get_scores(search.split(" "))
+        top_n_indices = scores.argsort()[-50:][::-1]
+
+        result = [{
+            "id": self.ids[i],
+            "title": self.titles[i],
+            "description": self.descriptions[i],
+            "rank": scores[i],
+        } for i in top_n_indices]
 
         return result

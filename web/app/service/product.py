@@ -20,3 +20,6 @@ class ProductService:
     
     def get_product_using_realmen_bm25(self, search: str):
         return self.product_repository.get_product_using_realmen_bm25(search)
+    
+    def get_product_using_lib_bm25(self, search: str) -> list[dict]:
+        return self.product_repository.get_product_using_lib_bm25(search)
