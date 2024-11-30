@@ -10,7 +10,7 @@ from app.template.template import get_template
 
 
 def get_product_repository(db=Depends(get_db_connection)) -> ProductRepository:
-    return ProductRepository(db)
+    return ProductRepository(db, "data/trim.csv")
 
 def get_product_service(user_repository=Depends(get_product_repository)) -> ProductService:
     return ProductService(user_repository)
@@ -23,13 +23,15 @@ def search_product(
     template: Jinja2Templates = Depends(get_template),
     request: Request = Request,
     search: str | None = Query(default="", max_length=100),
-    method: Literal["tsvector", "sbert"] = "tsvector"
+    method: Literal["tsvector", "sbert", "bm25"] = "tsvector"
 ):
     tic = time.perf_counter_ns()
     if (method == "tsvector"):
         product = service.get_product_using_tsvector(search)
-    else:
+    elif (method == "sbert"):
         product = service.get_product_using_sbert(search)
+    else:
+        product = service.get_product_using_realmen_bm25(search)
     toc = time.perf_counter_ns()
 
     def processor(x):

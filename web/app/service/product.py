@@ -17,3 +17,6 @@ class ProductService:
     def get_product_using_sbert(self, search: str):
         vector = minilm_embedder.encode(search, convert_to_tensor=False).tolist()
         return self.product_repository.get_product_using_sbert(vector)
+    
+    def get_product_using_realmen_bm25(self, search: str):
+        return self.product_repository.get_product_using_realmen_bm25(search)
