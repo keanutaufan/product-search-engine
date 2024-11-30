@@ -40,7 +40,8 @@ def search_product(
         return {
             "id": x["id"],
             "title": x["title"],
-            "description": re.sub('<[^<]+?>', '', x["description"])
+            "description": re.sub('<[^<]+?>', '', x["description"]),
+            "rank": x["rank"],
         }
 
     processed = [processor(p) for p in product]

@@ -164,6 +164,12 @@
       max-height: calc(1.5em * 3);
     }
 
+    .product .score {
+      margin: 0 0 4px 0;
+      font-size: 14px;
+      color: #444;
+    }
+
     .product .description * {
       display: inline;
       font-weight: normal;
@@ -226,6 +232,7 @@
           <a href="/product/{{ product.id }}">
             {{ product.title }}</h3>
           </a>
+          <div class="score">Score: {{ product.rank }}</div>
         <div class="description">{{ product.description }}</div>
       </div>
       {% endfor %}
