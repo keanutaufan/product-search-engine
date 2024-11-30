@@ -58,15 +58,20 @@ class ProductRepository:
         
     def get_product_using_realmen_bm25(self, search: str) -> list[dict]:
         tokenized_query = search.lower().split(" ")
-        scores = []
 
-        for tokenized_title, id, title, description in zip(self.tokenized_titles, self.ids, self.titles, self.descriptions):
-            score = sum(self.__realmen_bm25(word, tokenized_title, self.idf, self.avgdl) for word in tokenized_query)
-            scores.append({
-                "id": id,
-                "title": title,
-                "description": description,
-                "rank": score,
-            })
+        def compute_bm25(tokenized_title):
+            return sum(self.__realmen_bm25(word, tokenized_title, self.idf, self.avgdl) for word in tokenized_query)
         
-        return sorted(scores, key=lambda x: x["rank"], reverse=True)[:50]
+        scores = np.array([compute_bm25(token) for token in self.tokenized_titles])
+
+        top_indices = np.argpartition(-scores, 50)[:50]
+        top_indices = top_indices[np.argsort(-scores[top_indices])]
+
+        result = [{
+            "id": self.ids[i],
+            "title": self.titles[i],
+            "description": self.descriptions[i],
+            "rank": scores[i],
+        } for i in top_indices]
+
+        return result
